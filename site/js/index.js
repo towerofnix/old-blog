@@ -161,6 +161,9 @@ const loadArchive = () => {
 
   let table
 
+  // TODO: sometimes this fails the same way post loading fails (fetch never
+  // ends). That's the fault of the server (python3 -m http.server), but there
+  // should probably still be a timeout handler here.
   return fetchArchiveData()
     .then(buildPostsArchive)
     .then(_table => {table = _table})
