@@ -1,6 +1,6 @@
 'use strict'
 
-// Logic, networking ----------------------------------------------------------
+// Networking -----------------------------------------------------------------
 
 const fetchArchiveData = () => {
   return fetch('data/post-index.json')
@@ -11,6 +11,8 @@ const fetchPostMarkdown = title => {
   return fetch(`data/posts/${title}.md`)
     .then(res => res.text())
 }
+
+// Utilities ------------------------------------------------------------------
 
 const domifyMarkdown = md => {
   const converter = new showdown.Converter()
@@ -23,7 +25,17 @@ const domifyMarkdown = md => {
   return div
 }
 
-// Disqus
+const timeout = (ms, promise) => {
+  return Promise.race([
+    new Promise(resolve => {
+      setTimeout(() => resolve('timeout'), ms)
+    }),
+
+    promise
+  ])
+}
+
+// Disqus ---------------------------------------------------------------------
 
 const setupDisqus = () => {
   const disqusThread = document.createElement('div')
@@ -33,7 +45,8 @@ const setupDisqus = () => {
   const id = location.hash.slice(1)
 
   const disqusConfig = function() {
-    this.page.url = location.origin + `/disqus-hack/${id}`
+    // this.page.url = location.origin + `/disqus-hack/${id}`
+    this.page.url = location.href
     this.page.identifier = id
   }
 
@@ -60,7 +73,14 @@ const removeIntro = () => {
   document.getElementById('intro').remove()
 }
 
-const setupBlankPage = () => {
+const setupBlankPage = title => {
+  if (title == null) {
+    title = 'Untitled page? (Frown!)'
+  }
+
+  document.title = title
+  history.replaceState(null, title, location.href)
+
   const oldMain = document.body.querySelector('.main')
   if (oldMain) {
     oldMain.remove()
@@ -77,10 +97,16 @@ const buildBlankPage = () => {
 
   const a = document.createElement('a')
   a.href = '#index'
-  a.appendChild(document.createTextNode('(To index.)'))
+  a.appendChild(document.createTextNode('(Index.)'))
+
+  const a2 = document.createElement('a')
+  a2.href = '#archive'
+  a2.appendChild(document.createTextNode('(Archive.)'))
 
   const p = document.createElement('p')
   p.appendChild(a)
+  p.appendChild(document.createTextNode(' '))
+  p.appendChild(a2)
   main.appendChild(p)
 
   return main
@@ -111,7 +137,7 @@ const buildPostsArchive = postData => {
 }
 
 const loadIndex = () => {
-  const main = setupBlankPage()
+  const main = setupBlankPage('Index')
 
   const p = document.createElement('p')
 
@@ -126,7 +152,7 @@ const loadIndex = () => {
 }
 
 const loadArchive = () => {
-  const main = setupBlankPage()
+  const main = setupBlankPage('Archive')
 
   let table
 
@@ -150,14 +176,22 @@ const loadArchive = () => {
 }
 
 const loadPost = title => {
-  const main = setupBlankPage()
+  const main = setupBlankPage(title)
 
   let markdownContainer, disqus
 
   return Promise.all([
-    fetchPostMarkdown(title)
-      .then(domifyMarkdown)
-      .then(_md => { markdownContainer = _md }),
+    timeout(750,
+      fetchPostMarkdown(title)
+        .then(domifyMarkdown)
+        .then(_md => { markdownContainer = _md })
+    ).then(() => {
+      if (!markdownContainer) {
+        markdownContainer = document.createTextNode(
+          'Timeout when downloading post! Reload the page, maybe?'
+        )
+      }
+    }),
 
     setupDisqus()
       .then(_disqus => { disqus = _disqus })
@@ -180,7 +214,7 @@ const loadNotFound = () => {
   ))
   p.appendChild(a)
 
-  const main = setupBlankPage()
+  const main = setupBlankPage('Not Found')
   main.appendChild(p)
 }
 
