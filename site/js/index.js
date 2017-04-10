@@ -5,6 +5,11 @@
 const fetchArchiveData = () => {
   return fetch('data/post-index.json')
     .then(res => res.json())
+    .then(posts => Promise.all(posts.map(
+      file => fetch(`data/posts/${file}.json`)
+        .then(res => res.json())
+        .then(obj => Object.assign(obj, {file}))
+    )))
 }
 
 const fetchPostMarkdown = title => {
@@ -118,11 +123,11 @@ const buildPostsArchive = postData => {
   for (let post of postData) {
     // TODO: Better method of storing post information, such as the date it
     // was written. For now we only have its title!
-    const title = post
+    const { name, file } = post
 
     const a = document.createElement('a')
-    a.href = `#post-${title}`
-    a.appendChild(document.createTextNode(title))
+    a.href = `#post-${file}`
+    a.appendChild(document.createTextNode(name))
 
     const td = document.createElement('td')
     td.appendChild(a)
