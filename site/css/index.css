@@ -1,0 +1,14 @@
+body {
+  background-color: hsl(60, 70%, 95%);
+  color: black;
+}
+
+
+
+.main {
+  background-color: hsl(60, 50%, 97%);
+  padding: 30px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+  max-width: 800px;
+  margin: auto;
+}
