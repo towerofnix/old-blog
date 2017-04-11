@@ -34,7 +34,7 @@ too lazy to mess around with server hosts and Jekyll and other horrible stuff.
 
 Here's a picture, for good measure's sake.
 
-![Puppet thing](/media/00-puppet-thing.png)
+![Puppet thing](media/00-puppet-thing.png)
 
   [repo]: https://github.com/liam4/blog
   [scratch-flaws]: https://scratch.mit.edu/projects/152633913/
