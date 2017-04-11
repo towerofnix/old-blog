@@ -150,7 +150,7 @@ const loadIndex = () => {
     'Welcome to the site! It\'s pretty blank right now, but it\'ll ' +
     'hopefully work well enough as a basic blog. It\'d probably be best to ' +
     'start at the <a href=\'#archive\'>archive</a> (though in the future ' +
-    'I\'ll probably set up a more convenient category sistem).'
+    'I\'ll probably set up a more convenient category system).'
   )
 
   main.appendChild(p)
